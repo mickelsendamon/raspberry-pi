@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{chore.title}}{% endblock title %}
+
+{% block content %}
+<h1>Chore Detail</h1>
+{% if user.is_superuser %}
+<div class="row">
+    <div class="col-md-9">
+        <h3>{{chore.title}}</h3>
+    </div>
+    <div class="col-md-3 text-end">
+        <div class="row">
+            <div class="col-md-5">
+                <a class="btn btn-warning" href="{% url 'chores:chore_update' chore.pk %}">Edit</a>
+            </div>
+            <div class="col-md-5">
+                <a class="btn btn-danger" href="{% url 'chores:chore_delete' chore.pk %}">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<h3>{{chore.title}}</h3>
+{% endif %}
+
+<p>{{chore.description}}</p>
+<h3>Schedule</h3>
+<ul>
+{% for schedule in chore.schedules.all %}
+    <li>{{schedule}}</li>
+{% empty %}
+    <li>No Schedules yet.{% if user.is_superuser %} <a href="{% url 'chores:chore_schedule_create' %}">Create one.</a>{% endif %}</li>
+{% endfor %}
+</ul>
+{% endblock content %}

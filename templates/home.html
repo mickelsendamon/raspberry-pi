@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+<h1>Welcome</h1>
+{% if user.is_authenticated %}
+    <div class="row">
+        <div class="col-md-3">
+            <h3>Chores App</h3>
+            <p>A simple chore schedule for a household.</p>
+            <a href="{% url 'chores:chores_home' %}" class="btn btn-secondary">Check it out</a>
+        </div>
+        <div class="col-md-3">
+            <h3>Properties App</h3>
+            <p>For Airbnb hosts to help manage properties, items, bookings and more.</p>
+            <a href="{# url 'properties_home' #}" class="btn btn-secondary">Coming soon!</a>
+        </div>
+    </div>
+{% else %}
+    <h3>In order to access the content, please <a href="{% url 'two_factor:login' %}">login</a> to an account.</h3>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Email Validated{% endblock title %}
+
+{% block content %}
+<h1>Success!</h1>
+<p>Your email has been successfully validated and your account is now activated.</p>
+<p>Please continue to <a href="{% url 'login' %}">login</a> to complete your account setup.</p>
+{% endblock content %}

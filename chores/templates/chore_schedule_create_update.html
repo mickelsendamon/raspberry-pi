@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-3">🧹 Create Chore Schedule</h2>
+            <p class="text-muted">
+                To create a new chore schedule, select a chore below and choose the day(s) of the week it should be completed.
+                <br>This schedule will be repeated weekly.
+            </p>
+            <p class="text-muted">
+                <strong>Examples:</strong> Select only <em>Sunday</em> if the chore should be completed once per week.
+                Select <em>Tuesday</em> and <em>Friday</em> if it should be completed twice weekly.
+            </p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <!-- Chore Dropdown -->
+                <div class="mb-4">
+                    <label for="{{ form.chore.id_for_label }}" class="form-label fw-semibold">
+                        Chore <span class="text-danger">*</span>
+                    </label>
+                    {{ form.chore }}
+                    {% if form.chore.errors %}
+                    <div class="text-danger small">{{ form.chore.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Weekday checkboxes styled like a calendar week -->
+                <fieldset class="mb-4">
+                    <legend class="fw-semibold">Chore should be completed on:</legend>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <div class="form-check form-check-inline">
+                            {{ form.due_monday }}
+                            <label for="{{ form.due_monday.id_for_label }}" class="btn btn-outline-primary">
+                                Mon
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            {{ form.due_tuesday }}
+                            <label for="{{ form.due_tuesday.id_for_label }}" class="btn btn-outline-primary">
+                                Tue
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            {{ form.due_wednesday }}
+                            <label for="{{ form.due_wednesday.id_for_label }}" class="btn btn-outline-primary">
+                                Wed
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            {{ form.due_thursday }}
+                            <label for="{{ form.due_thursday.id_for_label }}" class="btn btn-outline-primary">
+                                Thu
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            {{ form.due_friday }}
+                            <label for="{{ form.due_friday.id_for_label }}" class="btn btn-outline-primary">
+                                Fri
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            {{ form.due_saturday }}
+                            <label for="{{ form.due_saturday.id_for_label }}" class="btn btn-outline-primary">
+                                Sat
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            {{ form.due_sunday }}
+                            <label for="{{ form.due_sunday.id_for_label }}" class="btn btn-outline-primary">
+                                Sun
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                        💾 Save Schedule
+                    </button>
+                    <a href="{% url 'chores:chore_schedule_list' %}" class="btn btn-outline-secondary">
+                        ✖ Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

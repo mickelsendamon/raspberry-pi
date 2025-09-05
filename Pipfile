@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+django-two-factor-auth = "*"
+qrcode = "*"
+phonenumbers = "*"
+django-countries = "*"
+celery = "*"
+twilio = "*"
+redis = "*"
+django-celery-beat = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

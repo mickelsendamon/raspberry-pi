@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Detail{% endblock title %}
+
+{% block content %}
+<h1>Schedule Details</h1>
+{% if user.is_superuser %}
+<div class="row d-flex justify-content-between">
+    <div class="col-10">
+        <h3>{{choreschedule.chore.title}}</h3>
+    </div>
+    <div class="col-2 text-end">
+        <div class="d-grid gap-2 d-md-block">
+    <!--    <div class="col-2 mx-auto">-->
+            <a href="{% url 'chores:chore_schedule_update' choreschedule.pk %}" class="btn btn-warning">Edit</a>
+    <!--    </div>-->
+    <!--    <div class="col-2 mx-auto">-->
+            <a href="{% url 'chores:chore_schedule_delete' choreschedule.pk %}" class="btn btn-danger">Delete</a>
+    <!--    </div>-->
+        </div>
+    </div>
+</div>
+{% else %}
+<h3>{{ choreschedule.chore.title }}</h3>
+{% endif %}
+<h4 class="mt-1">Schedule</h4>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <tr>
+            <th>Monday</th>
+            <td{% if choreschedule.due_monday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Tuesday</th>
+            <td{% if choreschedule.due_tuesday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Wednesday</th>
+            <td{% if choreschedule.due_wednesday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Thursday</th>
+            <td{% if choreschedule.due_thursday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Friday</th>
+            <td{% if choreschedule.due_friday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Saturday</th>
+            <td{% if choreschedule.due_saturday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Sunday</th>
+            <td{% if choreschedule.due_sunday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
+        </tr>
+    </table>
+</div>
+<br>
+
+{% if user.is_superuser %}
+<div class="row align-items-center mb-3">
+    <div class="col-md-8">
+        <h4 class="mb-0">Rotation Order</h4>
+    </div>
+    <div class="col-md-4 text-md-end mt-2 mt-md-0">
+        <a href="{% url 'chores:chore_schedule_order_create' %}" class="btn btn-sm btn-success">
+            + Add to Rotation
+        </a>
+    </div>
+</div>
+{% else %}
+<h4>Rotation Order</h4>
+{% endif %}
+{% if order %}
+<ul class="list-group">
+    {% for each in order %}
+    <li class="list-group-item d-flex justify-content-between align-items-center{% if each.user.pk == active_assignment.assigned_to.user.pk %} border-primary{% endif %}">
+        <div class="d-flex align-items-center">
+            <span class="badge bg-secondary me-2">
+                {{ each.order }}
+            </span>
+                <span>
+                {{ each.user.get_full_name|default:each.user.username }}
+            </span>
+        </div>
+        {% if each.user.pk == active_assignment.assigned_to.user.pk %}
+        <span class="badge bg-{% if active_assignment.overdue %}danger{% else %}primary{% endif %}">
+            Due {{ active_assignment.due_by|date:"M j" }}
+        </span>
+        {% if active_assignment.assigned_to.user == request.user and can_complete %}
+        <form action="{% url 'chores:chore_assignment_mark_complete' active_assignment.pk %}" method="post">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-success" value="Mark Complete">
+        </form>
+        {% endif %}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<div class="alert alert-info d-flex justify-content-between align-items-center">
+    <span>
+        Nobody is assigned to this chore yet.
+    </span>
+    <a href="{% url 'chores:chore_schedule_order_create' %}" class="btn btn-sm btn-primary">
+        Add one
+    </a>
+</div>
+{% endif %}
+
+{% endblock content %}

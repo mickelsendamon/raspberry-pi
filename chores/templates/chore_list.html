@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Chores{% endblock title %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-3 mb-0">
+    <h1>🧹 Chores</h1>
+    {% if user.is_superuser %}
+    <a href="{% url 'chores:chore_create' %}" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> New Chore
+    </a>
+    {% endif %}
+</div>
+
+<div class="container-fluid bg-secondary-subtle rounded py-2">
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Chore</th>
+                    <th>Description</th>
+                    <th>Next Due</th>
+                    <th>Assigned To</th>
+                    <th>Schedules</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for chore in chore_list %}
+                <tr>
+                    <td>
+                        <a href="{% url 'chores:chore_detail' chore.pk %}" class="fw-semibold text-decoration-none">
+                            {{ chore.title }}
+                        </a>
+                    </td>
+                    <td>{{ chore.description|default:"—" }}</td>
+
+                    <td>
+                        {{ chore.next_due_by|date:"M j, Y"|default:"-" }}
+                    </td>
+
+                    <td>
+                        {{ chore.next_user|default:"No User" }}
+                    </td>
+
+                    <td>
+                        {% if chore.schedules.count %}
+                        <span class="badge bg-primary">{{ chore.schedules.count }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">0</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted">
+                        No chores created yet.
+                        {% if user.is_superuser %}
+                        <a href="{% url 'chores:chore_create' %}">Create one now</a>.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
