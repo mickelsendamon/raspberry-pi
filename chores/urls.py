@@ -1,10 +1,10 @@
-from django.urls import path, reverse_lazy
-from django.views.generic import RedirectView, TemplateView
+from django.urls import path
 from .views import (
     HomeView,
     ChoreCreateView, ChoreDetailView, ChoreListView, ChoreDeleteView, ChoreUpdateView,
-    ChoreScheduleCreateView, ChoreScheduleDetailView, ChoreScheduleListView, ChoreScheduleDeleteView, ChoreScheduleUpdateView,
-    ChoreScheduleOrderCreateView, ChoreAssignmentMarkCompleteView, ChoreAssignmentListView
+    ChoreScheduleCreateView, ChoreScheduleDetailView, ChoreScheduleListView, ChoreScheduleDeleteView,
+    ChoreScheduleUpdateView,
+    ChoreScheduleOrderCreateView, UserTaskMarkCompleteView, ScheduleTaskCreateView, UserTaskListView
 )
 
 app_name = 'chores'
@@ -23,8 +23,9 @@ urlpatterns = [
     path('schedule/<int:pk>/update/', ChoreScheduleUpdateView.as_view(), name='chore_schedule_update'),
     path('schedule/<int:pk>/delete/', ChoreScheduleDeleteView.as_view(), name='chore_schedule_delete'),
 
-    path('schedule/order/create/', ChoreScheduleOrderCreateView.as_view(), name='chore_schedule_order_create'),
-    path('schedule/assignment/<int:pk>/complete/', ChoreAssignmentMarkCompleteView.as_view(), name='chore_assignment_mark_complete'),
+    path('schedule/task/create/', ScheduleTaskCreateView.as_view(), name='schedule_task_create'),
 
-    path('assignment/', ChoreAssignmentListView.as_view(), name='chore_assignment_list'),
+    path('schedule/order/create/', ChoreScheduleOrderCreateView.as_view(), name='chore_schedule_order_create'),
+    path('schedule/assignment/', UserTaskListView.as_view(), name='user_task_list'),
+    path('schedule/assignment/<int:pk>/complete/', UserTaskMarkCompleteView.as_view(), name='user_task_mark_complete'),
 ]

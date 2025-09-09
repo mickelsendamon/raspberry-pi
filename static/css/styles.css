@@ -1,0 +1,88 @@
+/* Styling for table to freeze first column when scrolling horizontally */
+.table-sticky th:first-child,
+.table-sticky td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;       /* make sure it stays on top of body cells */
+}
+.table-sticky th:first-child {
+    z-index: 3;       /* header above body cells */
+}
+
+/* Styling for wizard stepper used on login page */
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    position: relative;
+}
+.stepper::before {
+    content: "";
+    position: absolute;
+    top: 30%;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    background-color: #dee2e6; /* subtle line */
+    z-index: 0;
+}
+.step {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    flex: 1;
+}
+.step-circle {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border-radius: 50%;
+    line-height: 40px;
+    font-weight: bold;
+    background-color: #e9ecef; /* default subtle */
+    color: #6c757d;
+}
+.step.active .step-circle {
+    background-color: #0d6efd; /* bootstrap primary */
+    color: #fff;
+}
+.step-label {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+.step.active .step-label {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Apply bootstrap-like styles to all form elements inside .login-form */
+.login-form input,
+.login-form select,
+.login-form textarea {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    appearance: none;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Focus state (like .form-control:focus in Bootstrap) */
+.login-form input:focus,
+.login-form select:focus,
+.login-form textarea:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}

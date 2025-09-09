@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
 
 {% block title %}Schedule Detail{% endblock title %}
 
 {% block content %}
 <h1>Schedule Details</h1>
-{% if user.is_superuser %}
 <div class="row d-flex justify-content-between">
+{% if user.is_superuser %}
     <div class="col-10">
         <h3>{{choreschedule.chore.title}}</h3>
     </div>
@@ -21,39 +22,52 @@
     </div>
 </div>
 {% else %}
-<h3>{{ choreschedule.chore.title }}</h3>
+<div class="row justify-content-between">
+    <div class="col-10">
+        <h3>{{ choreschedule.chore.title }}</h3>
+    </div>
+    <div class="col-2 text-end">
+        <!-- Button trigger "Schedule Help" modal -->
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scheduleHelpModal">
+            <i class="bi bi-patch-question-fill"></i>
+        </button>
+    </div>
+</div>
 {% endif %}
 <h4 class="mt-1">Schedule</h4>
 <div class="table-responsive">
-    <table class="table table-striped">
-        <tr>
-            <th>Monday</th>
-            <td{% if choreschedule.due_monday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Tuesday</th>
-            <td{% if choreschedule.due_tuesday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Wednesday</th>
-            <td{% if choreschedule.due_wednesday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Thursday</th>
-            <td{% if choreschedule.due_thursday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Friday</th>
-            <td{% if choreschedule.due_friday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Saturday</th>
-            <td{% if choreschedule.due_saturday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Sunday</th>
-            <td{% if choreschedule.due_sunday %} class="text-success"><i class="bi bi-check2-circle"></i>{% else %} class="text-danger"><i class="bi bi-x-circle"></i>{% endif %}</td>
-        </tr>
+    <table class="table table-striped text-center">
+        <thead>
+            <tr>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for day in DAYS %}
+                {% with statuses=day_map|dict_get:day %}
+                <td{% if "due" in statuses %} class="table-success">
+                    <i class="bi bi-check-lg"></i>
+                    {% elif "start" in statuses %} class="table-info">
+                    <i class="bi bi-arrow-down"></i>
+                    {% elif "scheduled" in statuses %} class="table-warning">
+                    <i class="bi bi-arrow-right"></i>
+                    {% else %} class="table-danger">
+                    <i class="bi bi-x-lg"></i>
+                    {% endif %}
+                </td>
+                {% endwith %}
+                {% empty %}
+                <td colspan=7>No Days</td>
+                {% endfor %}
+            </tr>
+        </tbody>
     </table>
 </div>
 <br>
@@ -75,21 +89,27 @@
 {% if order %}
 <ul class="list-group">
     {% for each in order %}
-    <li class="list-group-item d-flex justify-content-between align-items-center{% if each.user.pk == active_assignment.assigned_to.user.pk %} border-primary{% endif %}">
+    <li class="list-group-item d-flex justify-content-between align-items-center{% if each.pk == active_order.pk %} border-primary{% endif %}">
         <div class="d-flex align-items-center">
-            <span class="badge bg-secondary me-2">
+            <span class="badge {% if each.pk == active_order.pk %}bg-primary{% else %}bg-secondary{% endif %} me-2">
                 {{ each.order }}
             </span>
-                <span>
+            <span>
                 {{ each.user.get_full_name|default:each.user.username }}
             </span>
         </div>
-        {% if each.user.pk == active_assignment.assigned_to.user.pk %}
-        <span class="badge bg-{% if active_assignment.overdue %}danger{% else %}primary{% endif %}">
-            Due {{ active_assignment.due_by|date:"M j" }}
+        {% if each.user.pk == active_task.user.pk %}
+        <span class="badge bg-{% if active_task.overdue %}danger{% elif active_task.is_complete %}success{% else %}primary{% endif %}">
+            {% if not active_task.is_complete and not active_task.is_incomplete %}
+            Due {{ active_task.due_by|date:"M j" }}
+            {% elif active_task.is_complete %}
+            Completed {{ active_task.completed_on|date:"M j" }}
+            {% else %}
+            Incomplete - Due {{ active_task.due_by|date:"M j" }}
+            {% endif %}
         </span>
-        {% if active_assignment.assigned_to.user == request.user and can_complete %}
-        <form action="{% url 'chores:chore_assignment_mark_complete' active_assignment.pk %}" method="post">
+        {% if active_task.user == request.user %}
+        <form action="{% url 'chores:user_task_mark_complete' active_task.pk %}" method="post">
             {% csrf_token %}
             <input type="submit" class="btn btn-success" value="Mark Complete">
         </form>
@@ -108,5 +128,7 @@
     </a>
 </div>
 {% endif %}
+
+{% include 'schedule_help_modal.html' %}
 
 {% endblock content %}

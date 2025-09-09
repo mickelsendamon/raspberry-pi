@@ -9,4 +9,5 @@ urlpatterns = [
     path('signup/done/', TemplateView.as_view(template_name='registration/signup_done.html'), name='signup_done'),
     path('activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
     path('activate/successful/', TemplateView.as_view(template_name='registration/activate_successful.html'), name='activate_successful'),
+
 ]

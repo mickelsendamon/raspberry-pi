@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1 class="mb-0 mt-2">The Chart</h1>
-<div class="container-fluid p-2 bg-secondary-subtle rounded">
+<div class="container-fluid p-2 border rounded">
     <ul class="nav nav-tabs" id="charTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <a class="nav-link active" id="current-chores-tab" data-bs-toggle="tab" data-bs-target="#current-chores-tab-pane" role="tab" aria-controls="current-chores-tab-pane" aria-selected="true">Current Chores</a>
@@ -13,29 +13,25 @@
             <a class="nav-link" id="previous-assignments-tab" data-bs-toggle="tab" data-bs-target="#previous-assignments-tab-pane" role="tab" aria-controls="previous-assignments-tab-pane" aria-selected="false">My Previous Assignments</a>
         </li>
     </ul>
-    <div class="tab-content p-2 border-top border-light border-2" id="myTabContent">
+    <div class="tab-content p-2" id="myTabContent">
         <div class="tab-pane fade show active" id="current-chores-tab-pane" role="tabpanel" aria-labelledby="current-chores-tab" tabindex="0">
             <div class="card mt-2">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">My Chores</h5>
-                    <span class="badge bg-{% if overdue_assignments_count > 1 %}danger{% else %}success{% endif %}">{{overdue_assignments_count}} Overdue</span>
+                    <span class="badge bg-{% if overdue_task_count > 1 %}danger{% else %}success{% endif %}">{{overdue_task_count}} Overdue</span>
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for chore in my_assignments %}
                     <li class="list-group-item d-flex justify-content-between align-items-center{% if chore.overdue %} bg-danger text-white{% endif %}">
                             <div class="col-md-8">
-                                <div data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{chore.tooltip}}">
-                                    <i class="bi bi-patch-question-fill"></i>
-                                    <strong>{{chore.title}}</strong> ({{chore.due_by}})
-                                </div>
+                                <i class="bi bi-patch-question-fill" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{chore.description}}"></i>
+                                <strong>{{chore.title}}</strong> ({{chore.due_by}})
                             </div>
-                            <div class="col-md-2">
-                                {% if chore.can_complete %}
-                                <form method="post" action="{% url 'chores:chore_assignment_mark_complete' chore.pk %}">
+                            <div class="col-md-2 text-end">
+                                <form method="post" action="{% url 'chores:user_task_mark_complete' chore.pk %}">
                                     {% csrf_token %}
-                                    <button class="btn btn-sm btn-success">Mark Complete</button>
+                                    <input type="submit" class="btn btn-sm btn-success" value="Mark Complete" />
                                 </form>
-                                {% endif %}
                             </div>
                     </li>
                     {% empty %}
@@ -50,22 +46,16 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for order in user_chore_schedules %}
-                    <li class="list-group-item border{% if order.overdue %} bg-danger-subtle{% endif %}">
+                    <li class="list-group-item{% if order.overdue %} bg-danger-subtle{% elif order.complete %} bg-success-subtle{% endif %}">
                         <div class="d-flex justify-content-between align-items-center">
                         <span>
                             <strong>{{ order.title }}</strong><br>
-                            Next Due: {{ order.due_by }}<br>
+                            {% if order.complete %}Completed {{ order.completed_on }}{% else %}Next Due: {{ order.due_by }}{% endif %}<br>
                             Assigned To: {{ order.assigned_to.get_full_name }}
                         </span>
-                            {% if order.overdue %}
-                            <a href="{% url 'chores:chore_schedule_detail' order.pk %}" class="btn btn-sm btn-primary">
+                            <a href="{% url 'chores:chore_schedule_detail' order.pk %}" class="btn btn-sm {% if order.overdue or order.complete %}btn-primary{% else %}btn-outline-primary{% endif %}">
                                 View
                             </a>
-                            {% else %}
-                            <a href="{% url 'chores:chore_schedule_detail' order.pk %}" class="btn btn-sm btn-outline-primary">
-                                View
-                            </a>
-                            {% endif %}
                         </div>
                     </li>
                     {% empty %}
@@ -84,10 +74,10 @@
                         <table class="table table-hover align-middle">
                             <thead>
                             <tr>
-                                <th>Assigned To</th>
+                                <th>Chore</th>
+                                <th>Complete?</th>
                                 <th>Due By</th>
                                 <th>Overdue?</th>
-                                <th>Complete?</th>
                                 <th>Completed By</th>
                             </tr>
                             </thead>
@@ -95,10 +85,13 @@
                             {% for assignment in previous_assignments %}
                             <tr>
                                 <td>
-                                    {% if assignment.assigned_to %}
-                                    {{ assignment.assigned_to.user }}
+                                    {{ assignment.schedule_task.schedule.chore.title }}
+                                </td>
+                                <td>
+                                    {% if assignment.is_complete %}
+                                    <span class="text-success fw-bold">✓</span>
                                     {% else %}
-                                    <em>Unassigned</em>
+                                    <span class="text-muted">Pending</span>
                                     {% endif %}
                                 </td>
                                 <td>{{ assignment.due_by|date:"M j, Y" }}</td>
@@ -110,17 +103,14 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if assignment.complete %}
-                                    <span class="text-success fw-bold">✓</span>
+                                    {% if assignment.is_complete %}
+                                    {% if assignment.completed_by == request.user %}
+                                    Me
                                     {% else %}
-                                    <span class="text-muted">Pending</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if assignment.completed_by %}
                                     {{ assignment.completed_by }}
+                                    {% endif %}
                                     {% else %}
-                                    <em>—</em>
+                                    <i class="bi bi-dash-lg"></i>
                                     {% endif %}
                                 </td>
                             </tr>

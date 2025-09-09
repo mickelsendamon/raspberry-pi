@@ -10,8 +10,9 @@ from django.views import View
 from django.http import HttpResponse
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import get_user_model
+from two_factor.views import LoginView as TFLoginView
 
-from .forms import CustomUserCreateForm
+from .forms import CustomUserCreateForm, CustomAuthenticationForm, CustomAuthenticationTokenForm, CustomBackupTokenForm
 from .models import CustomUser
 from .tokens import account_activation_token
 
@@ -39,6 +40,23 @@ class CustomUserCreateView(CreateView):
         email = EmailMessage(mail_subject, message, to=[user.email])
         email.send()
         return redirect('signup_done')
+
+
+class CustomLoginView(TFLoginView):
+    form_list = (
+                ('auth', CustomAuthenticationForm),
+                ('token', CustomAuthenticationTokenForm),
+                ('backup', CustomBackupTokenForm)
+            )
+
+    def get_form_class(self, step):
+        if step == 'auth':
+            return CustomAuthenticationForm
+        elif step == 'token':
+            return CustomAuthenticationTokenForm
+        elif step == 'backup':
+            return CustomBackupTokenForm
+        return super().get_form_class(step)
 
 
 class ActivateAccountView(View):

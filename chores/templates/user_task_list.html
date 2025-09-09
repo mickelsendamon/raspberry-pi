@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Assignments</h1>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Due</th>
+                <th>Assigned To</th>
+                <th>Completed On</th>
+                <th>Overdue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in usertask_list %}
+            <tr>
+                <td>{{ task.schedule_task.name }}</td>
+                <td>{{ task.due_by }}</td>
+                <td>{{ task.user.first_name }}</td>
+                <td>{% if task.is_complete %}{{ task.completed_on|date:"M j, Y" }}{% elif task.is_incomplete %}Incomplete{% else %}In Progress{% endif %}</td>
+                <td>{% if task.overdue %}Yes{% else %}No{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

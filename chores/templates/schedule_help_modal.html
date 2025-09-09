@@ -1,0 +1,101 @@
+<!-- Schedule Help Modal -->
+<div class="modal fade" id="scheduleHelpModal" tabindex="-1" aria-labelledby="scheduleHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Schedule Help</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>Icons Description</h5>
+                <table class="table table-responsive">
+                    <tr>
+                        <td class="table-danger"><i class="bi bi-x-lg"></i></td>
+                        <td><strong>No task</strong> scheduled today.</td>
+                    </tr>
+                    <tr>
+                        <td class="table-success"><i class="bi bi-check-lg"></i></td>
+                        <td><strong>Due</strong>: A task is due today and must be marked complete.</td>
+                    </tr>
+                    <tr>
+                        <td class="table-info"><i class="bi bi-arrow-down"></i></td>
+                        <td><strong>Assigned</strong>: A two or more day task can be started today and can be marked complete at this time.</td>
+                    </tr>
+                    <tr>
+                        <td class="table-warning"><i class="bi bi-arrow-right"></i></td>
+                        <td><strong>Scheduled</strong>: A task is scheduled today that isn't due yet, but can be marked complete.</td>
+                    </tr>
+                </table>
+                <p>This means you will see 3 different patterns in the Schedule table:</p>
+                <h6 class="card-title">Single Day Task</h6>
+                <table class="table table-responsive text-center">
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                    <tr>
+                        <td class="table-success"><i class="bi bi-check-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                    </tr>
+                </table>
+
+                <h6 class="card-title">Two Day Task</h6>
+                <table class="table table-responsive text-center">
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                    <tr>
+                        <td class="table-info"><i class="bi bi-arrow-down"></i></td>
+                        <td class="table-success"><i class="bi bi-check-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                    </tr>
+                </table>
+
+                <h6 class="card-title">Multiple Day Task</h6>
+                <table class="table table-responsive text-center">
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                    <tr>
+                        <td class="table-info"><i class="bi bi-arrow-down"></i></td>
+                        <td class="table-warning"><i class="bi bi-arrow-right"></i></td>
+                        <td class="table-warning"><i class="bi bi-arrow-right"></i></td>
+                        <td class="table-success"><i class="bi bi-check-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                        <td class="table-muted"><i class="bi bi-dash-lg"></i></td>
+                    </tr>
+                </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

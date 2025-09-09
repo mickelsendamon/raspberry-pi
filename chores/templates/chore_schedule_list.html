@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
 
+{% load custom_tags %}
+
 {% block title %}Schedules{% endblock title %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
     <h1>🗓️ Chore Schedules</h1>
+
+    <!-- Button trigger "Schedule Help" modal -->
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#scheduleHelpModal">
+        <i class="bi bi-patch-question-fill"></i>
+    </button>
+
     {% if user.is_superuser %}
     <a href="{% url 'chores:chore_schedule_create' %}" class="btn btn-success">
         <i class="bi bi-plus-lg"></i> New Schedule
@@ -12,21 +20,21 @@
     {% endif %}
 </div>
 
-<div class="container-fluid bg-secondary-subtle rounded pt-2">
+<div class="container-fluid border rounded pt-2">
     <div class="table-responsive rounded">
-        <table class="table table-striped align-middle">
+        <table class="table table-striped align-middle table-sticky">
             <thead class="table-light">
                 <tr>
                     <th>Chore</th>
-                    <th>Current Assignment</th>
-                    <th>Next Due Date</th>
-                    <th class="text-center">Mon</th>
+                    <th class="text-center border-start">Mon</th>
                     <th class="text-center">Tue</th>
                     <th class="text-center">Wed</th>
                     <th class="text-center">Thu</th>
                     <th class="text-center">Fri</th>
                     <th class="text-center">Sat</th>
-                    <th class="text-center">Sun</th>
+                    <th class="text-center border-end">Sun</th>
+                    <th>Current Assignment</th>
+                    <th>Next Due Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,19 +45,27 @@
                             {{ schedule.chore.title }}
                         </a>
                     </td>
+                    {% for day in DAYS %}
+                    {% with statuses=schedule.get_day_map|dict_get:day %}
+                    {% if "due" in statuses %}
+                    <td class="text-center table-success{% if day == 1 %} border-start{% endif %}{% if day == 7 %} border-end{% endif %}"><i class="bi bi-check-lg"></i></td>
+                    {% elif "start" in statuses %}
+                    <td class="text-center table-info{% if day == 1 %} border-start{% endif %}{% if day == 7 %} border-end{% endif %}"><i class="bi bi-arrow-down"></i></td>
+                    {% elif "scheduled" in statuses %}
+                    <td class="text-center table-warning{% if day == 1 %} border-start{% endif %}{% if day == 7 %} border-end{% endif %}"><i class="bi bi-arrow-right"></i></td>
+                    {% else %}
+                    <td class="text-center table-muted{% if day == 1 %} border-start{% endif %}{% if day == 7 %} border-end{% endif %}"><i class="bi bi-dash-lg"></i></td>
+                    {% endif %}
+                    {% endwith %}
+                    {% empty %}
+                    <td colspan="7" class="text-center border-end border-dark">No Tasks Scheduled</td>
+                    {% endfor %}
                     <td>{{ schedule.next_user|default:"Nobody yet" }}</td>
                     <td>{{ schedule.next_due_by|date:"M j, Y" }}</td>
-                    <td class="text-center">{% if schedule.due_monday %}<i class="bi bi-check2-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
-                    <td class="text-center">{% if schedule.due_tuesday %}<i class="bi bi-check2-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
-                    <td class="text-center">{% if schedule.due_wednesday %}<i class="bi bi-check2-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
-                    <td class="text-center">{% if schedule.due_thursday %}<i class="bi bi-check2-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
-                    <td class="text-center">{% if schedule.due_friday %}<i class="bi bi-check2-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
-                    <td class="text-center">{% if schedule.due_saturday %}<i class="bi bi-check2-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
-                    <td class="text-center">{% if schedule.due_sunday %}<i class="bi bi-check2-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-danger"></i>{% endif %}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="text-muted py-4">
+                    <td colspan="10" class="text-muted py-4">
                         No chores scheduled yet.
                         {% if user.is_superuser %}
                         <a href="{% url 'chores:chore_schedule_create' %}">Create one now</a>.
@@ -61,4 +77,7 @@
         </table>
     </div>
 </div>
+
+{% include 'schedule_help_modal.html' %}
+
 {% endblock content %}

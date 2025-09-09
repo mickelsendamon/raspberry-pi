@@ -1,25 +1,36 @@
-from django.contrib import admin
-from .models import Chore, ChoreSchedule, ChoreScheduleOrder, ChoreAssignment
+from django.contrib.admin import ModelAdmin, register
+from .models import Chore, ChoreSchedule, ChoreScheduleOrder, ScheduleTask, UserTask
 
 
 # Register your models here.
-@admin.register(Chore)
-class ChoreAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description')
+@register(Chore)
+class ChoreAdmin(ModelAdmin):
+    list_display = ('id', 'title', 'description')
 
 
-@admin.register(ChoreSchedule)
-class ChoreScheduleAdmin(admin.ModelAdmin):
+@register(ChoreSchedule)
+class ChoreScheduleAdmin(ModelAdmin):
     list_display = (
-        'chore', 'due_monday', 'due_tuesday', 'due_wednesday', 'due_thursday', 'due_friday', 'due_saturday', 'due_sunday'
+        'id', 'chore', 'rotation_type', 'active_order_id',
     )
 
 
-@admin.register(ChoreScheduleOrder)
-class ChoreScheduleOrderAdmin(admin.ModelAdmin):
-    list_display = ('schedule', 'user', 'order')
+@register(ScheduleTask)
+class ScheduleTaskAdmin(ModelAdmin):
+    list_display = (
+        'id', 'schedule', 'start_day_of_week', 'due_day_of_week'
+    )
 
 
-@admin.register(ChoreAssignment)
-class ChoreAssignmentAdmin(admin.ModelAdmin):
-    list_display = ('assigned_to', 'due_by', 'overdue', 'complete', 'completed_by')
+@register(ChoreScheduleOrder)
+class ChoreScheduleOrderAdmin(ModelAdmin):
+    list_display = ('id', 'schedule', 'user', 'order')
+
+
+@register(UserTask)
+class UserTaskAdmin(ModelAdmin):
+    list_display = (
+        'id', 'schedule_task', 'user', 'order', 'due_by', 'is_complete',
+        'completed_on', 'completed_by', 'overdue',
+        'is_incomplete', 'marked_incomplete_on', 'created_on',
+    )

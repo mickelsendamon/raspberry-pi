@@ -9,8 +9,8 @@ from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, DeleteView, UpdateView, TemplateView
 from two_factor.views import OTPRequiredMixin
 
-from .forms import ChoreScheduleForm, ChoreScheduleOrderForm
-from .models import Chore, ChoreSchedule, ChoreScheduleOrder, ChoreAssignment
+from .forms import ChoreScheduleForm, ChoreScheduleOrderForm, ScheduleTaskForm
+from .models import Chore, ChoreSchedule, ChoreScheduleOrder, ScheduleTask, UserTask
 from config.mixins import SuperuserRequiredMixin
 
 class HomeView(OTPRequiredMixin, TemplateView):
@@ -19,51 +19,48 @@ class HomeView(OTPRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Current assignments for this user
-        cas = ChoreAssignment.objects.filter(
-            assigned_to__user=self.request.user,
-            complete=False
+        # Current tasks for this user
+        cat = UserTask.objects.filter(
+            user=self.request.user,
+            is_complete=False,
+            is_incomplete=False,
         )
 
-        context["my_assignments"] = [
+        context['my_assignments'] = [
             {
-                "title": chore.assigned_to.schedule.chore.title,
-                "due_by": chore.due_by,
-                "description": chore.assigned_to.schedule.chore.description,
-                "overdue": chore.overdue,
-                "pk": chore.pk,
-                "can_complete": date.today() > chore.due_by - timedelta(days=3),
-            }
-            for chore in cas
+                "title": task.schedule_task.name,
+                "due_by": task.due_by,
+                "description": task.schedule_task.schedule.chore.description,
+                "overdue": task.overdue,
+                "pk": task.pk,
+            } for task in cat
         ]
 
         # Overdue count for badge
-        context["overdue_assignments_count"] = cas.filter(overdue=True).count()
+        context['overdue_task_count'] = cat.filter(overdue=True).count()
 
-        # User’s schedules, with the *next assignment* pulled in
-        user_schedule_orders = self.request.user.chore_schedule_orders.all()
-
+        # User’s chore schedules, with the assignment information
         user_chore_schedules = []
-        for order in user_schedule_orders:
-            active_assignment = ChoreAssignment.objects.filter(assigned_to__schedule=order.schedule, complete=False).order_by("-due_by").first()
-
+        for order in self.request.user.chore_schedule_orders.all():
+            active_assignment = UserTask.objects.filter(schedule_task__schedule=order.schedule).order_by("-due_by").first()
             user_chore_schedules.append({
                 'title': order.schedule.chore.title,
                 'due_by': active_assignment.due_by,
-                'assigned_to': active_assignment.assigned_to.user,
+                'assigned_to': active_assignment.user,
                 'overdue': active_assignment.overdue,
+                'complete': active_assignment.is_complete,
+                'completed_on': active_assignment.completed_on,
                 'pk': order.schedule.pk
             })
-
 
         context['user_chore_schedules'] = sorted(user_chore_schedules, key=lambda x: x["due_by"])
 
         # Previous assignments (completed OR ever assigned to the user)
         context["previous_assignments"] = (
-                ChoreAssignment.objects.filter(
-                    assigned_to__user=self.request.user
+                UserTask.objects.filter(
+                    user=self.request.user
                 )
-                | ChoreAssignment.objects.filter(completed_by=self.request.user)
+                | UserTask.objects.filter(completed_by=self.request.user)
         ).distinct()
 
         return context
@@ -87,17 +84,18 @@ class ChoreListView(OTPRequiredMixin, ListView):
     def get_queryset(self):
         # Grab the "next due assignment" for each ChoreSchedule
         assignment_qs = (
-            ChoreAssignment.objects
+            UserTask.objects
             .filter(
-                complete=False,
-                assigned_to__schedule__chore=OuterRef("pk")
+                is_complete=False,
+                is_incomplete=False,
+                schedule_task__schedule__chore=OuterRef("pk")
             )
             .order_by("due_by")  # earliest due date
         )
 
         return Chore.objects.annotate(
             next_due_by=Subquery(assignment_qs.values("due_by")[:1]),
-            next_user=Subquery(assignment_qs.values("assigned_to__user__first_name")[:1]),
+            next_user=Subquery(assignment_qs.values("user__first_name")[:1]),
         )
 
 
@@ -128,12 +126,29 @@ class ChoreScheduleDetailView(OTPRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['order'] = ChoreScheduleOrder.objects.filter(schedule=self.object).order_by('order')
-        try:
-            assignment = ChoreAssignment.objects.filter(complete=False, assigned_to__schedule=self.object)[0]
-            context['active_assignment'] = assignment
-            context['can_complete'] = date.today() > assignment.due_by - timedelta(days=2) # allow to mark complete 2 days before due
-        except IndexError:
-            pass
+        context['DAYS'] = [1, 2, 3, 4, 5, 6, 7]
+
+        from collections import defaultdict
+
+        day_map = defaultdict(list)
+
+        for task in self.object.tasks.all():
+            start = task.start_day_of_week
+            due = task.due_day_of_week
+            # Start day
+            day_map[start].append("start")
+            # Due day
+            day_map[due].append("due")
+            # In-between days
+            for day in range(start + 1, due):
+                day_map[day].append("scheduled")
+
+        context['day_map'] = day_map
+
+        active_task = UserTask.objects.filter(schedule_task__schedule=self.object, is_complete=False, is_incomplete=False)
+        context['active_task'] = active_task[0] if active_task.count() > 0 else UserTask.objects.filter(schedule_task__schedule=self.object).order_by('due_by').first()
+
+        context['active_order'] = ChoreScheduleOrder.objects.get(id=self.object.active_order_id)
 
         return context
 
@@ -145,10 +160,11 @@ class ChoreScheduleListView(OTPRequiredMixin, ListView):
     def get_queryset(self):
         # Grab the "next due assignment" for each ChoreSchedule
         assignment_qs = (
-            ChoreAssignment.objects
+            UserTask.objects
             .filter(
-                complete=False,
-                assigned_to__schedule=OuterRef("pk")
+                is_complete=False,
+                is_incomplete=False,
+                schedule_task__schedule=OuterRef("pk")
             )
             .order_by("due_by")  # earliest due date
         )
@@ -156,9 +172,14 @@ class ChoreScheduleListView(OTPRequiredMixin, ListView):
         return (
             ChoreSchedule.objects.annotate(
                 next_due_by=Subquery(assignment_qs.values("due_by")[:1]),
-                next_user=Subquery(assignment_qs.values("assigned_to__user__first_name")[:1]),
+                next_user=Subquery(assignment_qs.values("user__first_name")[:1]),
             )
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['DAYS'] = [1, 2, 3, 4, 5, 6, 7]
+        return context
 
 
 class ChoreScheduleUpdateView(OTPRequiredMixin, SuperuserRequiredMixin, UpdateView):
@@ -200,17 +221,27 @@ class ChoreScheduleOrderDeleteView(OTPRequiredMixin, SuperuserRequiredMixin, Del
     template_name = 'chore_schedule_delete.html'
 
 
-class ChoreAssignmentMarkCompleteView(OTPRequiredMixin, View):
+class ScheduleTaskCreateView(OTPRequiredMixin, CreateView):
+    model = ScheduleTask
+    template_name = 'schedule_task_create.html'
+    form_class = ScheduleTaskForm
+
+    def get_success_url(self):
+        return reverse_lazy('chores:chore_schedule_detail', args=[self.object.schedule.pk])
+
+
+class UserTaskListView(OTPRequiredMixin, ListView):
+    model = UserTask
+    template_name = 'user_task_list.html'
+
+
+class UserTaskMarkCompleteView(OTPRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
-        assignment = get_object_or_404(ChoreAssignment, pk=pk)
-        if assignment.complete:
+        task = get_object_or_404(UserTask, pk=pk)
+        sched_pk = task.schedule_task.schedule.pk
+        if task.is_complete:
             messages.add_message(request, ERROR, 'This chore is already completed.')
             return redirect('chores:chores_home')
-        next_assignment = assignment.mark_complete(request.user)
+        task.mark_complete(request.user)
 
-        return redirect('chores:chore_schedule_detail', pk=next_assignment.assigned_to.schedule.pk)
-
-
-class ChoreAssignmentListView(OTPRequiredMixin, SuperuserRequiredMixin, ListView):
-    model = ChoreAssignment
-    template_name = 'chore_assignment_list.html'
+        return redirect('chores:chore_schedule_detail', pk=sched_pk)

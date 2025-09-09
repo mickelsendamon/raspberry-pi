@@ -15,17 +15,45 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+import django.contrib.auth.views as auth_views
 from django.urls import path, include
-from django.views.generic import RedirectView, TemplateView
+from django.views.generic import TemplateView
 from two_factor.urls import urlpatterns as tf_urls
+from accounts.forms import CustomSetPasswordForm, CustomAuthenticationForm, CustomAuthenticationTokenForm, \
+    CustomBackupTokenForm
+from accounts.views import CustomLoginView
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
-    path('', include(tf_urls)),  # MFA login & setup
+
+    # Home
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
-    path('account/', include('django.contrib.auth.urls')),  # built-in auth
-    path('account/login/', RedirectView.as_view(pattern_name='two_factor:login')),  # enforce login via `two_factor:login`
+
+    # Two-factor auth & setup URLs (except login, which is overridden below)
+    path('', include(tf_urls)),
+
+    # Custom login with all three custom forms
+    path(
+        "account/login/",
+        CustomLoginView.as_view(),
+        name="account_login"
+    ),
+
+    # Password reset confirm (overriding form)
+    path(
+        "account/reset/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            form_class=CustomSetPasswordForm
+        ),
+        name="password_reset_confirm",
+    ),
+
+    # Built-in auth URLs (login/logout/password change, etc.)
+    path('account/', include('django.contrib.auth.urls')),
+
+    # Your app-specific URLs
     path('account/', include('accounts.urls')),
     path('chores/', include('chores.urls', namespace='chores')),
-    # path('properties/', include('properties.urls')),
 ]
+

@@ -12,8 +12,8 @@
     {% endif %}
 </div>
 
-<div class="container-fluid bg-secondary-subtle rounded py-2">
-    <div class="table-responsive shadow-sm rounded">
+<div class="container-fluid py-2">
+    <div class="table-responsive shadow-sm rounded border">
         <table class="table table-striped">
             <thead class="table-light">
                 <tr>
@@ -21,7 +21,6 @@
                     <th>Description</th>
                     <th>Next Due</th>
                     <th>Assigned To</th>
-                    <th>Schedules</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,14 +39,6 @@
 
                     <td>
                         {{ chore.next_user|default:"No User" }}
-                    </td>
-
-                    <td>
-                        {% if chore.schedules.count %}
-                        <span class="badge bg-primary">{{ chore.schedules.count }}</span>
-                        {% else %}
-                        <span class="badge bg-secondary">0</span>
-                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}

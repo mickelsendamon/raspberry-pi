@@ -1,0 +1,19 @@
+{% if wizard.steps.current == 'auth' or wizard.steps.current == 'token' %}
+    <div class="stepper">
+        <div class="step {% if wizard.steps.current == 'auth' %}active{% endif %}">
+            <div class="step-circle">1</div>
+            <div class="step-label">Log In</div>
+        </div>
+        <div class="step {% if wizard.steps.current == 'token' %}active{% endif %}">
+            <div class="step-circle">2</div>
+            <div class="step-label">Two Factor</div>
+        </div>
+    </div>
+{% elif wizard.steps.current == 'backup' %}
+    <div class="stepper">
+        <div class="step active">
+            <div class="step-circle">1</div>
+            <div class="step-label">Setup</div>
+        </div>
+    </div>
+{% endif %}

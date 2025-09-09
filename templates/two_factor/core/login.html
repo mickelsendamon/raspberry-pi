@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+
+    <div class="card d-inline-block">
+        <div class="card-header">
+            {% include 'two_factor/core/wizard_steps.html' %}
+        </div>
+        <div class="card-body">
+            <form method="post" class="login-form row g-3 mt-1">
+                {% csrf_token %}
+                {{ wizard.management_form }}
+                {% if wizard.steps.current == 'auth' %}
+                {% include 'two_factor/core/login_auth_form.html' %}
+
+                {% elif wizard.steps.current == 'token' %}
+                {% include 'two_factor/core/login_token_form.html' %}
+
+                {% elif wizard.steps.current == 'backup' %}
+                <p>Backup Step</p>
+                {% else %}
+                <p>Unknown Step</p>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

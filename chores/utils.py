@@ -15,6 +15,27 @@
 # todo Chore Swaps
 
 
+
+
+# from .models import UserTask
+#
+# def create_new_user_task(chore):
+#     existing_tasks = UserTask.objects.filter(schedule_task__schedule__chore=chore)
+#     if existing_tasks.count() > 0:
+#         return None
+#
+#     today_dow = timezone.now().isoweekday()
+#     schedule = chore.schedule
+#     order = chore.schedule.order.first()
+#     user = order.user
+#
+#     return UserTask.objects.create(
+#         schedule_task=chore.schedule.tasks.filter(start_day_int__gt=today_dow).first(),
+#         user=user,
+#         order=order,
+#     )
+
+
 # Notifications / Messages
 def send_text_message(phone_number, body):
     """
@@ -28,7 +49,10 @@ def send_text_message(phone_number, body):
     # print(f"""
     #     to=f'{phone_number}',
     #     from_=f'{settings.TWILIO_PHONE_NUMBER}',
-    print(body)
+    print(f"""
+    ### Send Text Message ###
+    {body}
+    """)
     # """
     # )
 

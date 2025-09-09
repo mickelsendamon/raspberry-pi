@@ -1,0 +1,43 @@
+<h3 class="card-title">Enter the code from your authenticator app.</h3>
+<hr>
+
+<!-- Form-level Errors -->
+{% if form.non_field_errors %}
+<div class="row-cols-1">
+    {% for error in form.non_field_errors %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Token Field -->
+    <label for="id_token-otp_token" class="form-label">Token</label>
+    {{ wizard.form.otp_token }}
+    {% if wizard.form.otp_token.help_text %}
+    <div class="container">
+        <div class="alert alert-info mt-2">
+            {{ wizard.form.otp_token.help_text }}
+        </div>
+    </div>
+    {% endif %}
+    {% if wizard.form.otp_token.errors %}
+    <div class="alert alert-danger">
+        Please fix the error(s) below:
+        <ul>
+            {% for error in wizard.form.otp_token.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mt-3 justify-content-end g-1">
+    <div class="col-auto">
+        <button class="btn btn-warning" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">Previous</button>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+<h3 class="card-title">Sign into your account below.</h3>
+<hr>
+
+<!-- Form-level Errors -->
+{% if wizard.form.non_field_errors %}
+<div class="row-cols-1">
+    {% for error in wizard.form.non_field_errors %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Email Field -->
+<div class="row">
+    <label for="id_username" class="form-label">Email</label>
+    {{ wizard.form.username }}
+    {% if wizard.form.username.help_text %}
+    <div class="container">
+        <div class="alert alert-info mt-2">
+            {{ wizard.form.username.help_text }}
+        </div>
+    </div>
+    {% endif %}
+    {% if wizard.form.username.errors %}
+    <div class="row-cols-1">
+        {% for error in wizard.form.new_password1.errors %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Password Field -->
+<div class="row">
+    <label for="id_auth_password" class="form-label">Password</label>
+    {{ wizard.form.password }}
+    {% if wizard.form.password.help_text %}
+    <div class="container">
+        <div class="alert alert-info mt-2">
+            {{ wizard.form.password.help_text }}
+        </div>
+    </div>
+    {% endif %}
+    {% if wizard.form.password.errors %}
+    <div class="row-cols-1">
+        {% for error in wizard.form.password.errors %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<div class="row mt-3 justify-content-end g-1">
+    <div class="col-auto">
+        <button disabled class="btn btn-warning" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">Previous</button>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+</div>

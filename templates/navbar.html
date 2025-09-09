@@ -22,6 +22,9 @@
                     <li>
                         <a href="{% url 'chores:chore_schedule_list' %}" class="dropdown-item">Schedules List</a>
                     </li>
+                    <li>
+                        <a href="{% url 'chores:user_task_list' %}" class="dropdown-item">Assignments List</a>
+                    </li>
                     {% if user.is_superuser %}
                     <li>
                         <a href="{% url 'chores:chore_create' %}" class="dropdown-item">New Chore</a>
@@ -56,6 +59,7 @@
                         <li>
                             <a class="dropdown-item" href="{% url 'two_factor:login' %}">Login</a>
                         </li>
+                        <li><a href="{% url 'account_login' %}" class="dropdown-item">Other Login Page</a></li>
                     </ul>
                     {% endif %}
                 </li>
