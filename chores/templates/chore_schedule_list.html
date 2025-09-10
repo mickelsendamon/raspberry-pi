@@ -60,8 +60,8 @@
                     {% empty %}
                     <td colspan="7" class="text-center border-end border-dark">No Tasks Scheduled</td>
                     {% endfor %}
-                    <td>{{ schedule.next_user|default:"Nobody yet" }}</td>
-                    <td>{{ schedule.next_due_by|date:"M j, Y" }}</td>
+                    <td>{{ schedule.assigned_user.first_name|default:"Nobody yet" }}</td>
+                    <td>{{ schedule.next_due_date|date:"M j, Y" }}</td>
                 </tr>
                 {% empty %}
                 <tr>

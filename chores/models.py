@@ -57,6 +57,51 @@ class ChoreSchedule(Model):
 
         return day_map
 
+    @property
+    def next_due_date(self):
+        """
+        Return the next due date for this schedule.
+        1. If there are active UserTasks, return the earliest due_by.
+        2. Otherwise, calculate from the ScheduleTasks.
+        """
+        # 1. Check for active user tasks
+        active_due = (
+            UserTask.objects
+            .filter(
+                schedule_task__schedule=self,
+                is_complete=False,
+                is_incomplete=False
+            )
+            .order_by("due_by")
+            .values_list("due_by", flat=True)
+            .first()
+        )
+        if active_due:
+            return active_due
+
+        # 2. Fallback: calculate based on ScheduleTasks
+        today = timezone.now().date()
+        today_weekday = today.weekday()  # Monday=1, Sunday=7
+
+        soonest_due = None
+        for task in self.tasks.all():  # self.tasks is from ScheduleTask.schedule related_name
+            days_until_due = (task.due_day_of_week - today_weekday) % 7
+            if days_until_due == 0:
+                days_until_due = 7  # next week if "today"
+            candidate = today + timedelta(days=days_until_due)
+
+            if soonest_due is None or candidate < soonest_due:
+                soonest_due = candidate
+
+        return soonest_due
+
+    @property
+    def assigned_user(self):
+        if not self.active_order_id:
+            return None
+        order = self.order.filter(order=self.active_order_id).first()
+        return getattr(order, "user", None)
+
 
 class ScheduleTask(Model):
     name = CharField(max_length=255)

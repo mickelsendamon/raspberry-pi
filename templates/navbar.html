@@ -6,32 +6,41 @@
     </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chores:chores_home' %}">The Chart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chores:chore_schedule_list' %}">Chore Schedules</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chores:user_task_list' %}">Assignments List</a>
+                </li>
                 {% if current_app == 'chores' %}
+                {% if user.is_superuser %}
                 <!-- Chores Menu -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Chores
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <a class="dropdown-item" href="{% url 'chores:chores_home' %}">The Chart</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'chores:chore_list' %}" class="dropdown-item">Chores List</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'chores:chore_schedule_list' %}" class="dropdown-item">Schedules List</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'chores:user_task_list' %}" class="dropdown-item">Assignments List</a>
-                    </li>
-                    {% if user.is_superuser %}
+<!--                    <li>-->
+<!--                        <a class="dropdown-item" href="{% url 'chores:chores_home' %}">The Chart</a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="{% url 'chores:chore_list' %}" class="dropdown-item">Chores List</a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="{% url 'chores:chore_schedule_list' %}" class="dropdown-item">Schedules List</a>-->
+<!--                    </li>-->
+<!--                    <li>-->
+<!--                        <a href="{% url 'chores:user_task_list' %}" class="dropdown-item">Assignments List</a>-->
+<!--                    </li>-->
                     <li>
                         <a href="{% url 'chores:chore_create' %}" class="dropdown-item">New Chore</a>
                     </li>
-                    {% endif %}
                     </ul>
                 </li>
+                {% endif %}
                 {% endif %}
 
                 <!-- User Action Dropdown Menu -->

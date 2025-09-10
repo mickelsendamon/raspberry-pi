@@ -45,11 +45,11 @@ class HomeView(OTPRequiredMixin, TemplateView):
             active_assignment = UserTask.objects.filter(schedule_task__schedule=order.schedule).order_by("-due_by").first()
             user_chore_schedules.append({
                 'title': order.schedule.chore.title,
-                'due_by': active_assignment.due_by,
-                'assigned_to': active_assignment.user,
-                'overdue': active_assignment.overdue,
-                'complete': active_assignment.is_complete,
-                'completed_on': active_assignment.completed_on,
+                'due_by': active_assignment.due_by if active_assignment else order.schedule.next_due_date,
+                'assigned_to': active_assignment.user if active_assignment else order.schedule.assigned_user,
+                'overdue': active_assignment.overdue if active_assignment else None,
+                'complete': active_assignment.is_complete if active_assignment else None,
+                'completed_on': active_assignment.completed_on if active_assignment else None,
                 'pk': order.schedule.pk
             })
 
@@ -148,7 +148,7 @@ class ChoreScheduleDetailView(OTPRequiredMixin, DetailView):
         active_task = UserTask.objects.filter(schedule_task__schedule=self.object, is_complete=False, is_incomplete=False)
         context['active_task'] = active_task[0] if active_task.count() > 0 else UserTask.objects.filter(schedule_task__schedule=self.object).order_by('due_by').first()
 
-        context['active_order'] = ChoreScheduleOrder.objects.get(id=self.object.active_order_id)
+        context['active_order'] = ChoreScheduleOrder.objects.get(id=self.object.active_order_id) if self.object.active_order_id != 0 else None
 
         return context
 
@@ -168,11 +168,14 @@ class ChoreScheduleListView(OTPRequiredMixin, ListView):
             )
             .order_by("due_by")  # earliest due date
         )
+        order_qs = (
+            ChoreScheduleOrder.objects.filter(schedule=OuterRef("pk"), order=OuterRef("active_order_id"))
+        )
 
         return (
             ChoreSchedule.objects.annotate(
                 next_due_by=Subquery(assignment_qs.values("due_by")[:1]),
-                next_user=Subquery(assignment_qs.values("user__first_name")[:1]),
+                next_user=Subquery(order_qs.values("user__first_name")[:1]),
             )
         )
 

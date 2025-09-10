@@ -89,7 +89,7 @@
 {% if order %}
 <ul class="list-group">
     {% for each in order %}
-    <li class="list-group-item d-flex justify-content-between align-items-center{% if each.pk == active_order.pk %} border-primary{% endif %}">
+    <li class="list-group-item d-flex justify-content-between align-items-center{% if each.order == choreschedule.active_order_id %} border-primary border-2{% endif %}">
         <div class="d-flex align-items-center">
             <span class="badge {% if each.pk == active_order.pk %}bg-primary{% else %}bg-secondary{% endif %} me-2">
                 {{ each.order }}
