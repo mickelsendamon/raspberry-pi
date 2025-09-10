@@ -221,9 +221,9 @@ class UserTask(Model):
         """
         if not self.is_complete and not self.is_incomplete:
             self.is_complete = True
+            self.completed_on = timezone.now()
             if user:
                 self.completed_by = user
-                self.completed_on = timezone.now()
             self.save()
 
     def mark_incomplete(self):
