@@ -6,18 +6,18 @@
 {% block content %}
 <h1>Schedule Details</h1>
 <div class="row d-flex justify-content-between">
-{% if user.is_superuser %}
+    {% if user.is_superuser %}
     <div class="col-10">
         <h3>{{choreschedule.chore.title}}</h3>
     </div>
     <div class="col-2 text-end">
         <div class="d-grid gap-2 d-md-block">
-    <!--    <div class="col-2 mx-auto">-->
+            <!--    <div class="col-2 mx-auto">-->
             <a href="{% url 'chores:chore_schedule_update' choreschedule.pk %}" class="btn btn-warning">Edit</a>
-    <!--    </div>-->
-    <!--    <div class="col-2 mx-auto">-->
+            <!--    </div>-->
+            <!--    <div class="col-2 mx-auto">-->
             <a href="{% url 'chores:chore_schedule_delete' choreschedule.pk %}" class="btn btn-danger">Delete</a>
-    <!--    </div>-->
+            <!--    </div>-->
         </div>
     </div>
 </div>
@@ -38,35 +38,35 @@
 <div class="table-responsive">
     <table class="table table-striped text-center">
         <thead>
-            <tr>
-                <th>Mon</th>
-                <th>Tue</th>
-                <th>Wed</th>
-                <th>Thu</th>
-                <th>Fri</th>
-                <th>Sat</th>
-                <th>Sun</th>
-            </tr>
+        <tr>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+            <th>Sun</th>
+        </tr>
         </thead>
         <tbody>
-            <tr>
-                {% for day in DAYS %}
-                {% with statuses=day_map|dict_get:day %}
-                <td{% if "due" in statuses %} class="table-success">
-                    <i class="bi bi-check-lg"></i>
-                    {% elif "start" in statuses %} class="table-info">
-                    <i class="bi bi-arrow-down"></i>
-                    {% elif "scheduled" in statuses %} class="table-warning">
-                    <i class="bi bi-arrow-right"></i>
-                    {% else %} class="table-danger">
-                    <i class="bi bi-x-lg"></i>
-                    {% endif %}
-                </td>
-                {% endwith %}
-                {% empty %}
-                <td colspan=7>No Days</td>
-                {% endfor %}
-            </tr>
+        <tr>
+            {% for day in DAYS %}
+            {% with statuses=day_map|dict_get:day %}
+            <td{% if "due" in statuses %} class="table-success">
+            <i class="bi bi-check-lg"></i>
+            {% elif "start" in statuses %} class="table-info">
+            <i class="bi bi-arrow-down"></i>
+            {% elif "scheduled" in statuses %} class="table-warning">
+            <i class="bi bi-arrow-right"></i>
+            {% else %} class="table-danger">
+            <i class="bi bi-x-lg"></i>
+            {% endif %}
+            </td>
+            {% endwith %}
+            {% empty %}
+            <td colspan=7>No Days</td>
+            {% endfor %}
+        </tr>
         </tbody>
     </table>
 </div>
@@ -91,14 +91,14 @@
     {% for each in order %}
     <li class="list-group-item d-flex justify-content-between align-items-center{% if each.order == choreschedule.active_order_id %} border-primary border-2{% endif %}">
         <div class="d-flex align-items-center">
-            <span class="badge {% if each.pk == active_order.pk %}bg-primary{% else %}bg-secondary{% endif %} me-2">
+            <span class="badge {% if each.order == choreschedule.active_order_id %}bg-primary{% else %}bg-secondary{% endif %} me-2">
                 {{ each.order }}
             </span>
             <span>
                 {{ each.user.get_full_name|default:each.user.username }}
             </span>
         </div>
-        {% if each.user.pk == active_task.user.pk %}
+        {% if each.order == choreschedule.active_order_id %}
         <span class="badge bg-{% if active_task.overdue %}danger{% elif active_task.is_complete %}success{% else %}primary{% endif %}">
             {% if not active_task.is_complete and not active_task.is_incomplete %}
             Due {{ active_task.due_by|date:"M j" }}
