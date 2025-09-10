@@ -236,6 +236,7 @@ class ScheduleTaskCreateView(OTPRequiredMixin, CreateView):
 class UserTaskListView(OTPRequiredMixin, ListView):
     model = UserTask
     template_name = 'user_task_list.html'
+    queryset = UserTask.objects.all().order_by('-due_by')
 
 
 class UserTaskMarkCompleteView(OTPRequiredMixin, View):
