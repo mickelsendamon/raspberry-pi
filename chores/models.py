@@ -81,7 +81,7 @@ class ChoreSchedule(Model):
 
         # 2. Fallback: calculate based on ScheduleTasks
         today = timezone.now().date()
-        today_weekday = today.weekday()  # Monday=1, Sunday=7
+        today_weekday = today.isoweekday()  # Monday=1, Sunday=7
 
         soonest_due = None
         for task in self.tasks.all():  # self.tasks is from ScheduleTask.schedule related_name
