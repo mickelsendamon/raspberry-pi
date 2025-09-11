@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_static',
     'two_factor',
     'two_factor.plugins.phonenumber',
+    'celery',
 
     'accounts',
     'chores',
