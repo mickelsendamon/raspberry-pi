@@ -7,3 +7,4 @@ celery
 twilio
 redis
 django-celery-beat
+psycopg2-binary
