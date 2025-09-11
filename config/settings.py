@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -44,7 +45,6 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_static',
     'two_factor',
     'two_factor.plugins.phonenumber',
-    'django_celery_beat',
 
     'accounts',
     'chores',
@@ -87,9 +87,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DJANGO_DB_NAME"),
+        "USER": os.getenv("DJANGO_DB_USER"),
+        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD"),
+        "HOST": os.getenv("DJANGO_DB_HOST"),
+        "PORT": os.getenv("DJANGO_DB_PORT"),
     }
 }
 
@@ -117,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'  # Should match settings.CELERY_TIMEZONE
+TIME_ZONE = 'America/Denver'  # os.getenv("DJANGO_TIMEZONE", 'America/Denver')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -144,22 +148,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Custom Email Backend
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST")
+EMAIL_PORT = os.getenv("DJANGO_EMAIL_PORT")
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("DJANGO_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DJANGO_EMAIL_DEFAULT_FROM_EMAIL")
+
 
 # Custom Login/Logout URL settings
 LOGIN_URL = 'two_factor:login'
-LOGIN_REDIRECT_URL = 'two_factor:profile'
+LOGIN_REDIRECT_URL = 'chores:chores_home'
 LOGOUT_REDIRECT_URL = 'two_factor:login'
 
-
-import os
-
-# Celery Settings
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/1')
-
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-
-CELERY_TIMEZONE = 'UTC'  # should match settings.TIME_ZONE
+# Security settings
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 1800  # 30 minutes
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = not DEBUG  # redirect all HTTP to HTTPS in prod
+SECURE_REFERRER_POLICY = "same-origin"

@@ -1,0 +1,9 @@
+django
+django-two-factor-auth
+qrcode
+phonenumbers
+django-countries
+celery
+twilio
+redis
+django-celery-beat
