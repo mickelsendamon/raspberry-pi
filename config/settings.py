@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
+DEBUG = True  # os.getenv("DJANGO_DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
@@ -88,12 +88,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DJANGO_DB_NAME"),
-        "USER": os.getenv("DJANGO_DB_USER"),
-        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD"),
-        "HOST": os.getenv("DJANGO_DB_HOST"),
-        "PORT": os.getenv("DJANGO_DB_PORT"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / os.getenv("DJANGO_DB_NAME", ""),
     }
 }
 
@@ -164,12 +160,21 @@ LOGIN_REDIRECT_URL = 'chores:chores_home'
 LOGOUT_REDIRECT_URL = 'two_factor:login'
 
 # Security settings
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_SECONDS = 1800  # 30 minutes
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
 SECURE_SSL_REDIRECT = not DEBUG  # redirect all HTTP to HTTPS in prod
 SECURE_REFERRER_POLICY = "same-origin"
+
+# Celery settings
+from celery.schedules import crontab
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BEAT_SCHEDULE = {
+	'overnight-chore-check': {
+		'task': 'chores.tasks.run_overnight_chore_check_task',
+		'schedule': crontab(minute=30, hour=17),
+	},
+}
+CELERY_TIMEZONE = 'America/Denver'

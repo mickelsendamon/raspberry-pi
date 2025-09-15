@@ -21,7 +21,8 @@ class Command(BaseCommand):
             is_complete=False,
             is_incomplete=False,
         )
-        self.stdout.write(f"```\nto_mark_overdue={to_mark_overdue}\n```")
+        overdue_count = to_mark_overdue.count()
+        self.stdout.write(f"```\nto_mark_overdue={overdue_count}\n```")
 
         for task in to_mark_overdue:
             self.stdout.write(f">>>>>>>>>>>> Mark overdue - {task}.")
@@ -30,7 +31,7 @@ class Command(BaseCommand):
 
         # 2. Generate new tasks for today
         to_generate_tasks = ScheduleTask.objects.filter(start_day_of_week=today_dow)
-        self.stdout.write(f'```\nto_generate_tasks={to_generate_tasks}\n```')
+        self.stdout.write(f'```\nto_generate_tasks={to_generate_tasks.count()}\n```')
 
         # 3. Mark incomplete (for tasks that should have been done before new ones are assigned)
         to_mark_incomplete = UserTask.objects.filter(
@@ -38,7 +39,7 @@ class Command(BaseCommand):
             is_incomplete=False,
             schedule_task__in=to_generate_tasks,
         )
-        self.stdout.write(f"```\nto_mark_incomplete={to_mark_incomplete}\n```")
+        self.stdout.write(f"```\nto_mark_incomplete={to_mark_incomplete.count()}\n```")
 
         for task in to_mark_incomplete:
             self.stdout.write(f">>>>>>>>>>>> Mark incomplete - {task}.")

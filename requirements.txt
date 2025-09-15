@@ -7,7 +7,6 @@ django-phonenumber-field
 django-two-factor-auth
 gunicorn
 packaging
-psycopg2-binary
 pypng
 qrcode
 sqlparse
