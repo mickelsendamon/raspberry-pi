@@ -108,7 +108,7 @@
             Incomplete - Due {{ active_task.due_by|date:"M j" }}
             {% endif %}
         </span>
-        {% if active_task.user == request.user %}
+        {% if active_task.user == request.user and active_task.is_complete %}
         <form action="{% url 'chores:user_task_mark_complete' active_task.pk %}" method="post">
             {% csrf_token %}
             <input type="submit" class="btn btn-success" value="Mark Complete">
