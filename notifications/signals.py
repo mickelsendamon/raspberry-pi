@@ -10,11 +10,9 @@ def send_assigned_task_notification(sender, instance, created, **kwargs):
     """
     Sends task notification for newly created tasks
     """
-    print('`send_assigned_task_notification signal triggered.')
     task_url = f"http://localhost:8000/tasks/{instance.id}/"
 
     if created:
-        print('send_task_assigned_email')
         send_task_assigned_email(instance, task_url)
         return
 
