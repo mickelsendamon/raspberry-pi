@@ -1,0 +1,27 @@
+{% extends "emails/base_email.html" %}
+
+{% block subject %}New Chore Assigned: {{ usertask.schedule_task.name }}{% endblock %}
+
+{% block content %}
+<p>Hi {{ usertask.user.first_name }},</p>
+
+<p>Good news 🎉 — a new chore has been assigned to you!</p>
+
+<div style="border: 2px solid #4CAF50; border-radius: 8px; padding: 16px; margin: 20px 0; background: #f9fff9;">
+    <h2 style="margin-top: 0; color: #4CAF50;">{{ usertask.schedule_task.name }}</h2>
+    <p style="margin: 8px 0 0; font-size: 15px; color: #555;">
+        {{ usertask.schedule_task.schedule.chore.description }}
+    </p>
+    <p style="margin: 12px 0 0; font-size: 16px;">
+        <strong>Due by:</strong> {{ usertask.due_by|date:"l, F j, Y" }}
+    </p>
+</div>
+
+<p>
+    Don’t worry — you’ve got this 👍. Take it one step at a time and mark it complete when you’re done.
+</p>
+
+<p style="margin-top: 20px; font-size: 14px; color: #555;">
+    Thank you for keeping things running smoothly!
+</p>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "emails/base_email.html" %}
+
+{% block subject %}Task Needs Attention: {{ usertask.schedule_task.name }}{% endblock %}
+
+{% block content %}
+<h2 style="color:#f0ad4e; margin-bottom:16px;">⚠️ Task Marked Incomplete</h2>
+
+<p>Hello {{ usertask.user.first_name|default:"there" }},</p>
+
+<p>
+    It looks like <strong>{{ usertask.schedule_task.name }}</strong> was marked incomplete.
+    No worries — sometimes things slip through! Here’s what’s pending:
+</p>
+
+<div style="border:1px solid #f0ad4e; background:#fffaf2; padding:16px; margin:24px 0; border-radius:8px;">
+    <h3 style="margin-top:0; color:#f0ad4e;">{{ usertask.schedule_task.name }}</h3>
+    <p style="margin:8px 0; font-size:14px; color:#555;">
+        {{ usertask.schedule_task.schedule.chore.description }}
+    </p>
+    <p style="margin:8px 0;">
+        <strong>Original Due Date:</strong> {{ usertask.due_by|date:"l, F jS" }}
+    </p>
+    {% if usertask.marked_incomplete_on %}
+    <p style="margin:8px 0; color:#f0ad4e;">
+        Marked incomplete on: {{ usertask.marked_incomplete_on|date:"l, F jS" }}
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

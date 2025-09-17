@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # os.getenv("DJANGO_DEBUG", "False").lower() == "true"
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'two_factor.plugins.phonenumber',
 
     'accounts',
+    'notifications',
     'chores',
 ]
 
@@ -89,7 +90,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / os.getenv("DJANGO_DB_NAME", ""),
+        "NAME": os.getenv("DJANGO_DB_NAME", "")
     }
 }
 
@@ -145,6 +146,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Custom Email Backend
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console
+# DEFAULT_FROM_EMAIL = 'the.chore.chart.app@gmail.com' # Console
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST")
 EMAIL_PORT = os.getenv("DJANGO_EMAIL_PORT")
@@ -160,8 +162,8 @@ LOGIN_REDIRECT_URL = 'chores:chores_home'
 LOGOUT_REDIRECT_URL = 'two_factor:login'
 
 # Security settings
-CSRF_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_SSL_REDIRECT = not DEBUG  # redirect all HTTP to HTTPS in prod
@@ -172,7 +174,7 @@ from celery.schedules import crontab
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_BEAT_SCHEDULE = {
-	'overnight-chore-check': {
+    'overnight-chore-check': {
 		'task': 'chores.tasks.run_overnight_chore_check_task',
 		'schedule': crontab(minute=30, hour=17),
 	},

@@ -1,0 +1,30 @@
+{% extends "emails/base_email.html" %}
+
+{% block subject %}
+Chore Completed: {{ usertask.schedule_task.name }}
+{% endblock %}
+
+{% block content %}
+<h2 style="color:#4CAF50; margin-top:0;">
+    🎉 Great job, {{ usertask.user.first_name|default:"there" }}!
+</h2>
+
+<p>
+    You’ve marked the following task as <strong>complete</strong>:
+</p>
+
+<div style="background-color:#f9fff9; border:1px solid #d4edda; padding:15px; border-radius:8px; margin:20px 0;">
+    <h3 style="margin:0; color:#2e7d32;">{{ usertask.schedule_task.name }}</h3>
+    <p style="margin:5px 0 0; color:#555;">
+        {{ usertask.schedule_task.schedule.chore.description }}
+    </p>
+    <p style="margin:10px 0 0; font-size:14px; color:#777;">
+        Completed on: {{ usertask.completed_on|date:"l, F j, Y" }}
+    </p>
+</div>
+
+<p>
+    Your effort helps keep everything running smoothly. Thank you for doing your part!
+</p>
+
+{% endblock %}

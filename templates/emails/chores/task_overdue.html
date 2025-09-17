@@ -1,0 +1,35 @@
+{% extends "emails/base_email.html" %}
+
+{% block subject %}Chore Overdue: {{ usertask.schedule_task.name }}{% endblock %}
+
+{% block content %}
+<h2 style="color:#d9534f; margin-bottom:16px;">⏰ Task Overdue</h2>
+<p>Hello {{ usertask.user.first_name|default:"there" }},</p>
+
+<p>
+    One of your chores has slipped past its due date. Don’t worry — it happens!
+    Let’s get you back on track.
+</p>
+
+<div style="border:1px solid #eee; background:#fff8f8; padding:16px; margin:24px 0; border-radius:8px;">
+    <h3 style="margin-top:0; color:#b52b27;">{{ usertask.schedule_task.name }}</h3>
+    <p style="margin:8px 0; font-size:14px; color:#555;">
+        {{ usertask.schedule_task.schedule.chore.description }}
+    </p>
+    <p style="margin:8px 0;">
+        <strong>Was due by:</strong> {{ usertask.due_by|date:"l, F jS" }}
+    </p>
+    <p style="margin:8px 0; color:#b52b27;">
+        ⚠️ This task is now overdue.
+    </p>
+</div>
+
+<p>
+    You can still complete it now and get back to a clean slate.
+</p>
+
+<p style="margin-top:24px; font-size:13px; color:#888;">
+    Remember: finishing your chores helps everyone in the household.
+    We’re rooting for you!
+</p>
+{% endblock %}

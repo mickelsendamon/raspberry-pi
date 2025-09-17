@@ -25,7 +25,6 @@ class CustomSetPasswordForm(SetPasswordForm):
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print('CustomAuthenticationForm called')
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control border-dark'})
 
@@ -33,7 +32,6 @@ class CustomAuthenticationForm(AuthenticationForm):
 class CustomAuthenticationTokenForm(AuthenticationTokenForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print('CustomAuthenticationTokenForm called')
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control border-dark'})
 
@@ -41,6 +39,5 @@ class CustomAuthenticationTokenForm(AuthenticationTokenForm):
 class CustomBackupTokenForm(BackupTokenForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print('CustomBackupTokenForm called')
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control border-dark'})
