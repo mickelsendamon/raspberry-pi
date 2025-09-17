@@ -144,6 +144,54 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+# Custom Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,   # keep Django’s built-ins
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name} '
+                      '({filename}:{lineno}) - {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',   # log everything DEBUG and above
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'django-debug.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['file', 'console'],
+        'level': 'DEBUG',
+    },
+    'loggers': {
+        # Django internals
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        # Log database queries (careful: very verbose!)
+        'django.db.backends': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
 # Custom Email Backend
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console
 # DEFAULT_FROM_EMAIL = 'the.chore.chart.app@gmail.com' # Console
