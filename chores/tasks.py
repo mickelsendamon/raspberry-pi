@@ -1,5 +1,6 @@
 import logging
 from celery import shared_task
+from chores.models import UserTask
 from notifications.emails.services import send_email
 from django.core.management import call_command
 
@@ -10,7 +11,8 @@ def run_overnight_chore_check_task():
     logger.info("Overnight chore check task started")
     msg = send_email('emails/system/overnight_chore_task_start',
                "Overnight System Task: started", ['damon.mickelsen@gmail.com'])
-    logger.info(msg)
+    active_tasks = UserTask.objects.filter(is_complete=False, is_incomplete=False)
+    logger.info(f'Tasks: {active_tasks}')
     # try:
     #     call_command("run_overnight_chore_check")
     #     send_email('emails/system/overnight_chore_task_complete',
