@@ -8,6 +8,13 @@ from django.core.management import call_command
 
 logger = logging.getLogger(__name__)
 
+
+@shared_task
+def test_task():
+    """A simple task that outputs 'Success' into the log."""
+    logger.info('Success')
+
+
 @shared_task
 def run_overnight_chore_check_task():
     logger.info("Overnight chore check task started")
