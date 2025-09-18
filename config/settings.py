@@ -237,10 +237,5 @@ SECURE_REFERRER_POLICY = "same-origin"
 from celery.schedules import crontab
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_BEAT_SCHEDULE = {
-    'overnight-chore-check': {
-		'task': 'chores.tasks.run_overnight_chore_check_task',
-		'schedule': crontab(minute=30, hour=17),
-	},
-}
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_TIMEZONE = 'America/Denver'
