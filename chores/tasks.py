@@ -18,9 +18,9 @@ def run_overnight_chore_check_task():
     today_dow = today.isoweekday()  # Monday=1, Sunday=7
 
     logger.info("Running overnight chore check...")
-    logger.info(f"``\ntoday={today}\n```")
-    logger.info(f"```\nyesterday={yesterday}\n```")
-    logger.info(f"```\ntoday_dow={today_dow}\n```")
+    logger.info(f"today={today}")
+    logger.info(f"yesterday={yesterday}")
+    logger.info(f"today_dow={today_dow}")
 
     # 1. Mark overdue
     to_mark_overdue = UserTask.objects.filter(
@@ -29,16 +29,16 @@ def run_overnight_chore_check_task():
         is_incomplete=False,
     )
     overdue_count = to_mark_overdue.count()
-    logger.info(f"```\nto_mark_overdue={overdue_count}\n```")
+    logger.info(f"to_mark_overdue={overdue_count}")
 
     for task in to_mark_overdue:
         logger.info(f">>>>>>>>>>>> Mark overdue - {task}.")
-        # task.mark_overdue()
-    # logger.info(f"Marked {to_mark_overdue.count()} tasks as overdue.")
+        task.mark_overdue()
+    logger.info(f"Marked {to_mark_overdue.count()} tasks as overdue.")
 
     # 2. Generate new tasks for today
     to_generate_tasks = ScheduleTask.objects.filter(start_day_of_week=today_dow)
-    logger.info(f'```\nto_generate_tasks={to_generate_tasks.count()}\n```')
+    logger.info(f'to_generate_tasks={to_generate_tasks.count()}')
 
     # 3. Mark incomplete (for tasks that should have been done before new ones are assigned)
     to_mark_incomplete = UserTask.objects.filter(
@@ -46,12 +46,12 @@ def run_overnight_chore_check_task():
         is_incomplete=False,
         schedule_task__in=to_generate_tasks,
     )
-    logger.info(f"```\nto_mark_incomplete={to_mark_incomplete.count()}\n```")
+    logger.info(f"to_mark_incomplete={to_mark_incomplete.count()}")
 
     for task in to_mark_incomplete:
         logger.info(f">>>>>>>>>>>> Mark incomplete - {task}.")
-        # task.mark_incomplete()
-    # logger.info(f"Marked {to_mark_incomplete.count()} tasks as incomplete.")
+        task.mark_incomplete()
+    logger.info(f"Marked {to_mark_incomplete.count()} tasks as incomplete.")
 
     # 4. Create new UserTasks for today
     for sched_task in to_generate_tasks:
@@ -72,15 +72,15 @@ def run_overnight_chore_check_task():
             days=(sched_task.due_day_of_week - today_dow) % 7
         )}"""
                           )
-        # UserTask.objects.create(
-        #     schedule_task=sched_task,
-        #     user=assigned_user,
-        #     order=current_order,
-        #     due_by=today + timezone.timedelta(
-        #         days=(sched_task.due_day_of_week - today_dow) % 7
-        #     )
-        # )
-        # logger.info(f"Generated new task for {assigned_user} ({sched_task}).")
+        UserTask.objects.create(
+            schedule_task=sched_task,
+            user=assigned_user,
+            order=current_order,
+            due_by=today + timezone.timedelta(
+                days=(sched_task.due_day_of_week - today_dow) % 7
+            )
+        )
+        logger.info(f"Generated new task for {assigned_user} ({sched_task}).")
 
     logger.info("Overnight chore check complete.")
 
