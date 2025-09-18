@@ -166,6 +166,11 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'django-debug.log'),
             'formatter': 'verbose',
         },
+        "celery_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(os.path.dirname(os.path.dirname(__file__)), "celery.log"),
+        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -177,6 +182,16 @@ LOGGING = {
         'level': 'DEBUG',
     },
     'loggers': {
+        "celery": {
+            "handlers": ["celery_file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "chores.tasks": {
+            "handlers": ["celery_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
         # Django internals
         'django': {
             'handlers': ['file', 'console'],
