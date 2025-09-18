@@ -10,7 +10,7 @@ def run_overnight_chore_check_task():
     logger.info("Overnight chore check task started")
     msg = send_email('emails/system/overnight_chore_task_start',
                "Overnight System Task: started", ['damon.mickelsen@gmail.com'])
-    print(msg)
+    logger.info(msg)
     # try:
     #     call_command("run_overnight_chore_check")
     #     send_email('emails/system/overnight_chore_task_complete',
