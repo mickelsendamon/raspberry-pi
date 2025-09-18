@@ -51,7 +51,7 @@ def run_overnight_chore_check_task():
     to_mark_incomplete = UserTask.objects.filter(
         is_complete=False,
         is_incomplete=False,
-        schedule_task__in=to_generate_tasks,
+        schedule_task__schedule_id__in=to_generate_tasks.values_list('schedule_id', flat=True).distinct(),
     )
     logger.info(f"to_mark_incomplete={to_mark_incomplete.count()}")
 
@@ -90,13 +90,3 @@ def run_overnight_chore_check_task():
         logger.info(f"Generated new task for {assigned_user} ({sched_task}).")
 
     logger.info("Overnight chore check complete.")
-
-    # try:
-    #     call_command("run_overnight_chore_check")
-    #     send_email('emails/system/overnight_chore_task_complete',
-    #                "Overnight System Task: complete", ['damon.mickelsen@gmail.com'])
-    #     logger.info("Overnight chore check task completed successfully")
-    # except Exception as e:
-    #     send_email('emails/system/overnight_chore_task_error',
-    #                "Overnight System Task: error", ['damon.mickelsen@gmail.com'])
-    #     logger.exception("Overnight chore check task failed")
