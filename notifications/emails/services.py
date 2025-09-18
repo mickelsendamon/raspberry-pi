@@ -57,6 +57,7 @@ def send_email(template_prefix, subject, to, context=None, from_email="the.chore
                     "context": safe_context,
                 }
             )
+    return msg
 
 
 def send_task_assigned_email(usertask, task_url):
