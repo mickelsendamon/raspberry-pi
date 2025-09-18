@@ -1,0 +1,19 @@
+{% extends "base_email.html" %}
+
+{% block subject %}Overnight Task Encountered an Error{% endblock %}
+
+{% block content %}
+<p>Hello,</p>
+<p>The scheduled overnight task encountered an error and did not finish successfully.</p>
+
+{% if error_message %}
+<p><strong>Error details:</strong></p>
+<pre style="background:#f8f8f8;padding:10px;border-radius:6px;white-space:pre-wrap;">
+{{ error_message }}
+</pre>
+{% else %}
+<p>No additional error details were provided.</p>
+{% endif %}
+
+<p>Please check the server logs for more information.</p>
+{% endblock %}
