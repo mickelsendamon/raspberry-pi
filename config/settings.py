@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'two_factor',
     'two_factor.plugins.phonenumber',
     'django_celery_beat',
+    'django_celery_results',
 
     'accounts',
     'notifications',
@@ -234,8 +235,7 @@ SECURE_SSL_REDIRECT = not DEBUG  # redirect all HTTP to HTTPS in prod
 SECURE_REFERRER_POLICY = "same-origin"
 
 # Celery settings
-from celery.schedules import crontab
-
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_TIMEZONE = 'America/Denver'
+CELERY_RESULT_BACKEND = "django-db"

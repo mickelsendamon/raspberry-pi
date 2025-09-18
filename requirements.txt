@@ -1,6 +1,7 @@
 asgiref
 Django
 django-celery-beat
+django-celery-results
 django-countries
 django-formtools
 django-otp
