@@ -1,7 +1,10 @@
+import logging
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 from notifications.models import Notification
+
+logger = logging.getLogger(__name__)
 
 
 def send_email(template_prefix, subject, to, context=None, from_email="the.chores.chart.app@gmail.com"):
@@ -35,8 +38,10 @@ def send_email(template_prefix, subject, to, context=None, from_email="the.chore
     try:
         msg.send()
         delivered = True
-    except Exception:
+        logger.info(f'Successfully sent email: {subject}')
+    except Exception as e:
         delivered = False
+        logger.error(f'Failed to send email: {e}')
 
     # Log to database
     if 'usertask' in context.keys():

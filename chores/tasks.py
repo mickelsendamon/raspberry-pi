@@ -4,7 +4,6 @@ from celery import shared_task
 from django.utils import timezone
 from chores.models import UserTask, ScheduleTask
 from notifications.emails.services import send_email
-from django.core.management import call_command
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +12,20 @@ logger = logging.getLogger(__name__)
 def test_task():
     """A simple task that outputs 'Success' into the log."""
     logger.info('Success')
+
+
+@shared_task
+def test_email():
+    """
+    A simple task that sends an email and logs the result.
+    Used to validate email backend.
+    """
+    msg = send_email(
+        'emails/system/test_email',
+        'Test Email',
+        ['damon.mickelsen@gmail.com', 'the.chore.chart.app@gmail.com']
+    )
+    logger.info(msg)
 
 
 @shared_task
