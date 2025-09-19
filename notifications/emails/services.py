@@ -7,7 +7,7 @@ from notifications.models import Notification
 logger = logging.getLogger(__name__)
 
 
-def send_email(template_prefix, subject, to, context=None, from_email="the.chores.chart.app@gmail.com"):
+def send_email(template_prefix, subject, to, context=None, from_email="the.chores.chart.app@gmail.com", logger=logger):
     """
     Generic email sender that handles both HTML and plain text templates.
 

@@ -23,7 +23,8 @@ def test_email():
     msg = send_email(
         'emails/system/test_email',
         'Test Email',
-        ['damon.mickelsen@gmail.com', 'the.chore.chart.app@gmail.com']
+        ['damon.mickelsen@gmail.com', 'the.chore.chart.app@gmail.com'],
+        logger=logger,
     )
     logger.info(msg)
 
