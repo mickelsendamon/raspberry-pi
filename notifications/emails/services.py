@@ -3,6 +3,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 from notifications.models import Notification
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,8 @@ def send_email(template_prefix, subject, to, context=None, from_email="the.chore
         context (dict, optional): Context passed to templates.
         from_email (str, optional): The "from" email address.
     """
+    logger.info(f'Host: {settings.EMAIL_HOST}')
+    logger.info(f'Port: {settings.EMAIL_PORT}')
     if context is None:
         context = {}
     context.setdefault("year", timezone.now().year)
