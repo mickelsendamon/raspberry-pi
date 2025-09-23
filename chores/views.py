@@ -51,7 +51,7 @@ class HomeView(OTPRequiredMixin, TemplateView):
                 'pk': order.schedule.pk
             })
 
-        context['user_chore_schedules'] = sorted(user_chore_schedules, key=lambda x: x["due_by"])
+        context['user_chore_schedules'] = sorted(user_chore_schedules, key=lambda x: x["task_date"])
 
         # Previous assignments (completed OR ever assigned to the user)
         context["previous_assignments"] = (
