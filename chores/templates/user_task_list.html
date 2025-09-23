@@ -6,21 +6,25 @@
     <table class="table">
         <thead>
             <tr>
+                <th>Chore</th>
                 <th>Task</th>
-                <th>Due</th>
+                <th>Status</th>
                 <th>Assigned To</th>
+                <th>Due</th>
                 <th>Completed On</th>
-                <th>Overdue</th>
+                <th>Completed By</th>
             </tr>
         </thead>
         <tbody>
             {% for task in usertask_list %}
             <tr>
+                <td>{{ task.schedule_task.schedule.chore.title }}</td>
                 <td>{{ task.schedule_task.name }}</td>
-                <td>{{ task.due_by }}</td>
+                <td>{% if task.is_complete %}Complete{% elif task.is_incomplete %}Incomplete{% else %}In Progress{% if task.overdue %} - Overdue{% endif %}{% endif %}</td>
                 <td>{{ task.user.first_name }}</td>
-                <td>{% if task.is_complete %}{{ task.completed_on|date:"M j, Y" }}{% elif task.is_incomplete %}Incomplete{% else %}In Progress{% endif %}</td>
-                <td>{% if task.overdue %}Yes{% else %}No{% endif %}</td>
+                <td>{{ task.due_by }}</td>
+                <td>{% if task.is_complete %}{{ task.completed_on|date:"M j, Y" }}{% else %}<i class="bi bi-dash-lg"></i>{% endif %}</td>
+                <td>{% if task.is_complete %}{{ task.completed_by }}{% else %}<i class="bi bi-dash-lg"></i>{% endif %}</td>
             </tr>
             {% endfor %}
         </tbody>
