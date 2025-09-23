@@ -20,7 +20,7 @@
             <tr>
                 <td>{{ task.schedule_task.schedule.chore.title }}</td>
                 <td>{{ task.schedule_task.name }}</td>
-                <td>{% if task.is_complete %}Complete{% elif task.is_incomplete %}Incomplete{% else %}In Progress{% if task.overdue %} - Overdue{% endif %}{% endif %}</td>
+                <td{% if task.is_complete %} class="table-success">Complete{% elif task.is_incomplete %} class="table-danger">Incomplete{% elif task.overdue %} class="table-warning">In Progress - Overdue{% else %} class="table-info">In Progress{% endif %}</td>
                 <td>{{ task.user.first_name }}</td>
                 <td>{{ task.due_by }}</td>
                 <td>{% if task.is_complete %}{{ task.completed_on|date:"M j, Y" }}{% else %}<i class="bi bi-dash-lg"></i>{% endif %}</td>
