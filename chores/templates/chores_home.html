@@ -42,22 +42,50 @@
 
             <div class="card mt-3">
                 <div class="card-header">
-                    <h5 class="mb-0">Chore Schedules I'm In</h5>
+                    <h5 class="mb-0">My Schedules</h5>
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for order in user_chore_schedules %}
-                    <li class="list-group-item{% if order.overdue %} bg-danger-subtle{% elif order.complete %} bg-success-subtle{% endif %}">
+                    {% if order.status == 'Complete' %}
+                    <li class="list-group-item bg-success-subtle">
                         <div class="d-flex justify-content-between align-items-center">
                         <span>
                             <strong>{{ order.title }}</strong><br>
-                            {% if order.complete %}Completed {{ order.completed_on }}{% else %}Next Due: {{ order.due_by }}{% endif %}<br>
-                            Assigned To: {{ order.assigned_to.get_full_name }}
+                            Completed On: {{ order.task_date }}<br>
+                            Assigned To: {{ order.assigned_to.first_name }}
                         </span>
-                            <a href="{% url 'chores:chore_schedule_detail' order.pk %}" class="btn btn-sm {% if order.overdue or order.complete %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <a href="{% url 'chores:chore_schedule_detail' order.pk %}" class="btn btn-sm btn-primary">
                                 View
                             </a>
                         </div>
                     </li>
+                    {% elif order.status == 'Overdue' %}
+                    <li class="list-group-item bg-danger-subtle">
+                        <div class="d-flex justify-content-between align-items-center">
+                        <span>
+                            <strong>{{ order.title }}</strong><br>
+                            Overdue Since: {{ order.task_date }}<br>
+                            Assigned To: {{ order.assigned_to.first_name }}
+                        </span>
+                            <a href="{% url 'chores:chore_schedule_detail' order.pk %}" class="btn btn-sm btn-primary">
+                                View
+                            </a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item bg-success-subtle">
+                        <div class="d-flex justify-content-between align-items-center">
+                        <span>
+                            <strong>{{ order.title }}</strong><br>
+                            Next Due: {{ order.task_date }}<br>
+                            Assigned To: {{ order.assigned_to.first_name }}
+                        </span>
+                            <a href="{% url 'chores:chore_schedule_detail' order.pk %}" class="btn btn-sm btn-primary">
+                                View
+                            </a>
+                        </div>
+                    </li>
+                    {% endif %}
                     {% empty %}
                     <li class="list-group-item text-muted">You're not in any schedules yet.</li>
                     {% endfor %}

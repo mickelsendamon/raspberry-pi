@@ -42,14 +42,12 @@ class HomeView(OTPRequiredMixin, TemplateView):
         # User’s chore schedules, with the assignment information
         user_chore_schedules = []
         for order in self.request.user.chore_schedule_orders.all():
-            active_assignment = UserTask.objects.filter(is_complete=False, is_incomplete=False, schedule_task__schedule=order.schedule).order_by("-due_by").first()
+            active_assignment = UserTask.objects.filter(schedule_task__schedule=order.schedule).order_by("-due_by").first()
             user_chore_schedules.append({
                 'title': order.schedule.chore.title,
-                'due_by': active_assignment.due_by if active_assignment else order.schedule.next_due_date,
-                'assigned_to': active_assignment.user if active_assignment else order.schedule.assigned_user,
-                'overdue': active_assignment.overdue if active_assignment else None,
-                'complete': active_assignment.is_complete if active_assignment else None,
-                'completed_on': active_assignment.completed_on if active_assignment else None,
+                'task_date': active_assignment.completed_on if active_assignment.is_complete else active_assignment.due_by,
+                'assigned_to': active_assignment.user,
+                'status': 'Complete' if active_assignment.is_complete else 'Overdue' if active_assignment.overdue else 'In Progress',
                 'pk': order.schedule.pk
             })
 
