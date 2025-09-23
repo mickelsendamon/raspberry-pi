@@ -2,7 +2,7 @@ import datetime
 import logging
 from celery import shared_task
 from django.utils import timezone
-from chores.models import UserTask, ScheduleTask
+from chores.models import UserTask, ScheduleTask, ChoreSchedule
 from notifications.emails.services import send_email
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,25 @@ def test_email():
         logger=logger,
     )
     logger.info(msg)
+
+
+@shared_task
+def run_rotate_schedules_check():
+    today = timezone.now().date().isoweekday()
+    if today == 1:  # Monday
+        all_schedules = ChoreSchedule.objects.all()
+        for sched in all_schedules:
+            order_count = sched.order.count()
+
+            if order_count == 0:
+                continue
+
+            if sched.active_order_id < order_count:
+                sched.active_order_id += 1
+            else:
+                sched.active_order_id = 1  # wrap back to first
+
+            sched.save()
 
 
 @shared_task
