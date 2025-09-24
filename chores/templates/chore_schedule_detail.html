@@ -95,25 +95,21 @@
                 {{ each.order }}
             </span>
             <span>
-                {{ each.user.get_full_name|default:each.user.username }}
+                {{ each.user.first_name|default:each.user.email }}
             </span>
         </div>
         {% if each.order == choreschedule.active_order_id %}
         <span class="badge bg-{% if active_task.overdue %}danger{% elif active_task.is_complete %}success{% else %}primary{% endif %}">
             {% if not active_task.is_complete and not active_task.is_incomplete %}
             Due {{ active_task.due_by|date:"M j" }}
-            {% elif active_task.is_complete %}
+            {% if active_task.is_complete %}
             Completed {{ active_task.completed_on|date:"M j" }}
+            {% elif active_task.overdue %}
+            Overdue {{ active_task.due_by|date:"M j" }}
             {% else %}
-            Incomplete - Due {{ active_task.due_by|date:"M j" }}
+            Undefined || {{ active_task.pk }} ||
             {% endif %}
         </span>
-        {% if active_task.user == request.user and not active_task.is_complete %}
-        <form action="{% url 'chores:user_task_mark_complete' active_task.pk %}" method="post">
-            {% csrf_token %}
-            <input type="submit" class="btn btn-success" value="Mark Complete">
-        </form>
-        {% endif %}
         {% endif %}
     </li>
     {% endfor %}

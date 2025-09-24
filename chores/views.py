@@ -47,11 +47,11 @@ class HomeView(OTPRequiredMixin, TemplateView):
                 'title': order.schedule.chore.title,
                 'task_date': active_assignment.completed_on if active_assignment.is_complete else active_assignment.due_by,
                 'assigned_to': active_assignment.user,
-                'status': 'Complete' if active_assignment.is_complete else 'Overdue' if active_assignment.overdue else 'In Progress',
+                'status': 3 if active_assignment.is_complete else 2 if active_assignment.overdue else 1,
                 'pk': order.schedule.pk
             })
 
-        context['user_chore_schedules'] = sorted(user_chore_schedules, key=lambda x: x["task_date"])
+        context['user_chore_schedules'] = sorted(user_chore_schedules, key=lambda x: x["status"])
 
         # Previous assignments (completed OR ever assigned to the user)
         context["previous_assignments"] = (
@@ -143,8 +143,7 @@ class ChoreScheduleDetailView(OTPRequiredMixin, DetailView):
 
         context['day_map'] = day_map
 
-        active_task = UserTask.objects.filter(schedule_task__schedule=self.object, is_complete=False, is_incomplete=False)
-        context['active_task'] = active_task[0] if active_task.count() > 0 else UserTask.objects.filter(schedule_task__schedule=self.object).order_by('due_by').first()
+        context['active_task'] = UserTask.objects.filter(schedule_task__schedule=self.object).order_by('-due_by').first()
 
         context['active_order'] = ChoreScheduleOrder.objects.get(id=self.object.active_order_id) if self.object.active_order_id != 0 else None
 

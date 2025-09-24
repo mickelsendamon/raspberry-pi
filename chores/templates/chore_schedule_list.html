@@ -54,7 +54,7 @@
                     {% elif "scheduled" in statuses %}
                     <td class="text-center table-warning{% if day == 1 %} border-start{% endif %}{% if day == 7 %} border-end{% endif %}"><i class="bi bi-arrow-right"></i></td>
                     {% else %}
-                    <td class="text-center table-muted{% if day == 1 %} border-start{% endif %}{% if day == 7 %} border-end{% endif %}"><i class="bi bi-dash-lg"></i></td>
+                    <td class="text-center table-muted{% if day == 1 %} border-start{% endif %}{% if day == 7 %} border-end{% endif %}"><i class="bi bi-x-lg"></i></td>
                     {% endif %}
                     {% endwith %}
                     {% empty %}
