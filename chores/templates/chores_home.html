@@ -18,7 +18,7 @@
             <div class="card mt-2">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">My Chores</h5>
-                    <span class="badge bg-{% if overdue_task_count > 1 %}danger{% else %}success{% endif %}">{{overdue_task_count}} Overdue</span>
+                    <span class="badge bg-{% if overdue_task_count > 0 %}danger{% else %}success{% endif %}">{{overdue_task_count}} Overdue</span>
                 </div>
                 <ul class="list-group list-group-flush">
                     {% for chore in my_assignments %}
